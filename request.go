@@ -2,8 +2,11 @@ package go_curl
 
 import (
 	"bytes"
+	"crypto/tls"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -65,6 +68,7 @@ func (this *Request) SetCookies(cookies map[string]string) *Request {
 	return this
 }
 func (this *Request) SetProxy(urlstr string) *Request {
+	this.Proxy = urlstr
 	return this
 }
 func (this *Request) SetContentType(contentType string) *Request {
@@ -81,23 +85,42 @@ func (this *Request) setCookies() error {
 	return nil
 }
 
-func (this *Request, ) send() (*Response, error) {
+func (this *Request, ) Send() (*Response, error) {
 	cli := &http.Client{}
+
 	cli.Timeout = this.TimeOut * time.Second
+	tr := &http.Transport{
+	}
+	if this.Proxy != "" {
+		proxy := func(_ *http.Request) (*url.URL, error) {
+			return url.Parse(this.Proxy)
+		}
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           proxy,
+		}
+	}
+	cli.Transport = tr
 	url := this.Url
 	method := this.Method
+	if this.ContentType == "" {
+		this.ContentType = "application/x-www-form-urlencoded"
+	}
 	payload := bytes.NewBufferString(this.Data)
 	if req, err := http.NewRequest(method, url, payload); err != nil {
 		return nil, err
 	} else {
 		this.req = req
 	}
-	this.setCookies()
+
 	this.req.Header.Set(strings.ToUpper("content-type"), this.ContentType)
 	this.req.Header.Set(strings.ToUpper("User-Agent"), this.UserAgent)
+	this.setCookies()
+
 	for k, v := range this.Header {
 		this.req.Header.Set(strings.ToUpper(k), v)
 	}
+	this.cli = cli
 	res, err := this.cli.Do(this.req)
 	resp := &Response{}
 	if err == nil {
@@ -106,8 +129,7 @@ func (this *Request, ) send() (*Response, error) {
 			resp = &Response{Header: (res.Header), Body: string(body), Status: res.Status, StatusCode: res.StatusCode}
 		}
 	} else {
-		panic(err)
+		fmt.Println(err)
 	}
-	this.res = res
 	return resp, err
 }
