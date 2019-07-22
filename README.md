@@ -27,7 +27,7 @@ curl := NewCurl()
 	//设置代理
 	proxy:="http://119.5.0.75:808"
 	userAgent := "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
-	res, _ := curl.SetUrl("https://www.google.com").SetProxy(proxy).SetHeader(header).SetUserAgent(userAgent).SetMethod("post").SetData(string(data2)).SetContentType("application/x-www-form-urlencoded").SetCookies(cookies).send()
+	res, _ := curl.SetUrl("https://www.google.com").SetProxy(proxy).SetHeader(header).SetUserAgent(userAgent).SetMethod("post").SetData(string(data2)).SetCookies(cookies).Send()
 	fmt.Println(res.Body)
  
 ```
