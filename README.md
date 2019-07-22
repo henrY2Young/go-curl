@@ -50,6 +50,6 @@ curl := NewCurl()
 设置content-type 这值和请求的data配合，确保请求端能够获取到传值
 
 
-##Response
+## Response
 
 response中有header,body,status,statuscode等值
