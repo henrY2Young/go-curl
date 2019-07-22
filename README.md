@@ -1,5 +1,9 @@
 # go-curl
+```
 
+go get -u github.com/henrY2Young/go-curl
+
+```
 ### 使用方法
 
 ```
